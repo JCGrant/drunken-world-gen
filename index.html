@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <title>Drunken World Generator</title>
+    <meta charset='UTF-8'/>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id='canvas'></canvas>
+    <script>
+      const getRandomInt = (min, max) =>
+        Math.floor(Math.random() * (max - min + 1)) + min;
+
+      const objToLocationSearch = (obj) =>
+        "?" + Object.entries(obj)
+          .map(([key, value]) => encodeURIComponent(key) + "=" + encodeURIComponent(value))
+          .join("&");
+
+      const getCanvas = (width, height, scale) => {
+        const canvas = document.getElementById('canvas');
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        return canvas;
+      }
+
+      const getStartPosition = (width, height, range) => ({
+        x: width / 2 + getRandomInt(-range, range),
+        y: height / 2 + getRandomInt(-range, range),
+      });
+
+      const drunkenStep = ({x, y}) => ({
+        x: x + getRandomInt(-1, 1),
+        y: y + getRandomInt(-1, 1),
+      });
+
+      const getNextPosition = (pos) => {
+        return drunkenStep(pos);
+      };
+
+      const walk = (ctx, pos, distance, scale) => {
+        for (let i = 0; i < distance; i++) {
+          ctx.fillRect(pos.x * scale, pos.y * scale, scale, scale);
+          pos = getNextPosition(pos);
+        }
+      }
+
+      const runWalkers = (ctx, n, startPos, distance, scale) => {
+        for (let i = 0; i < n; i++) {
+          walk(ctx, startPos, distance, config.scale);
+        }
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      let config = {
+        scale: parseInt(urlParams.get('scale')) || 5,
+        walkDistance: parseInt(urlParams.get('walkDistance')) || 2000,
+        numWalkers: parseInt(urlParams.get('numWalkers')) || 20,
+        numStartPositions: parseInt(urlParams.get('numStartPositions')) || 1,
+        startPositionDistanceRange:
+          parseInt(urlParams.get('startPositionDistanceRange')) || 0,
+        globalAlpha: parseFloat(urlParams.get('globalAlpha')) || 0.1,
+      };
+      config = {
+        width: parseInt(urlParams.get('width')) || Math.floor(window.innerWidth / config.scale),
+        height: parseInt(urlParams.get('height')) || Math.floor(window.innerHeight / config.scale) - 10,
+        ...config
+      };
+      window.history.pushState('', '', objToLocationSearch(config));
+
+      const canvas = getCanvas(config.width, config.height, config.scale);
+
+      const ctx = canvas.getContext('2d');
+      ctx.globalAlpha = config.globalAlpha;
+      ctx.fillStyle = 'black';
+
+      for (let i = 0; i < config.numStartPositions; i++) {
+        let startPos = getStartPosition(
+          config.width,
+          config.height,
+          config.startPositionDistanceRange,
+        );
+        runWalkers(ctx, config.numWalkers, startPos, config.walkDistance, config.scale);
+      }
+    </script>
+  </body>
+</html>
