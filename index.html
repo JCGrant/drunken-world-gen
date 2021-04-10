@@ -18,17 +18,17 @@
 
       const getConfig = () => {
         const urlParams = new URLSearchParams(window.location.search);
-        const scale = parseInt(urlParams.get('scale')) || 5;
+        const scale = parseInt(urlParams.get('scale')) || 3;
         return {
           width: parseInt(urlParams.get('width')) || Math.floor(window.innerWidth / scale),
           height: parseInt(urlParams.get('height')) || Math.floor(window.innerHeight / scale) - 10,
           scale,
           walkDistance: parseInt(urlParams.get('walkDistance')) || 2000,
-          numWalkers: parseInt(urlParams.get('numWalkers')) || 20,
-          numStartPositions: parseInt(urlParams.get('numStartPositions')) || 1,
+          numWalkers: parseInt(urlParams.get('numWalkers')) || 10,
+          numStartPositions: parseInt(urlParams.get('numStartPositions')) || 10,
           startPositionDistanceRange:
-            parseInt(urlParams.get('startPositionDistanceRange')) || 0,
-          globalAlpha: parseFloat(urlParams.get('globalAlpha')) || 0.1,
+            parseInt(urlParams.get('startPositionDistanceRange')) || 100,
+          globalAlpha: parseFloat(urlParams.get('globalAlpha')) || 0.05,
         };
       };
 
