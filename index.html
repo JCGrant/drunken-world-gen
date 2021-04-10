@@ -16,6 +16,22 @@
       const getRandomInt = (min, max) =>
         Math.floor(Math.random() * (max - min + 1)) + min;
 
+      const getConfig = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const scale = parseInt(urlParams.get('scale')) || 5;
+        return {
+          width: parseInt(urlParams.get('width')) || Math.floor(window.innerWidth / scale),
+          height: parseInt(urlParams.get('height')) || Math.floor(window.innerHeight / scale) - 10,
+          scale,
+          walkDistance: parseInt(urlParams.get('walkDistance')) || 2000,
+          numWalkers: parseInt(urlParams.get('numWalkers')) || 20,
+          numStartPositions: parseInt(urlParams.get('numStartPositions')) || 1,
+          startPositionDistanceRange:
+            parseInt(urlParams.get('startPositionDistanceRange')) || 0,
+          globalAlpha: parseFloat(urlParams.get('globalAlpha')) || 0.1,
+        };
+      };
+
       const objToLocationSearch = (obj) =>
         "?" + Object.entries(obj)
           .map(([key, value]) => encodeURIComponent(key) + "=" + encodeURIComponent(value))
@@ -26,7 +42,7 @@
         canvas.width = width * scale;
         canvas.height = height * scale;
         return canvas;
-      }
+      };
 
       const getStartPosition = (width, height, range) => ({
         x: width / 2 + getRandomInt(-range, range),
@@ -47,29 +63,15 @@
           ctx.fillRect(pos.x * scale, pos.y * scale, scale, scale);
           pos = getNextPosition(pos);
         }
-      }
+      };
 
       const runWalkers = (ctx, n, startPos, distance, scale) => {
         for (let i = 0; i < n; i++) {
           walk(ctx, startPos, distance, config.scale);
         }
-      }
+      };
 
-      const urlParams = new URLSearchParams(window.location.search);
-      let config = {
-        scale: parseInt(urlParams.get('scale')) || 5,
-        walkDistance: parseInt(urlParams.get('walkDistance')) || 2000,
-        numWalkers: parseInt(urlParams.get('numWalkers')) || 20,
-        numStartPositions: parseInt(urlParams.get('numStartPositions')) || 1,
-        startPositionDistanceRange:
-          parseInt(urlParams.get('startPositionDistanceRange')) || 0,
-        globalAlpha: parseFloat(urlParams.get('globalAlpha')) || 0.1,
-      };
-      config = {
-        width: parseInt(urlParams.get('width')) || Math.floor(window.innerWidth / config.scale),
-        height: parseInt(urlParams.get('height')) || Math.floor(window.innerHeight / config.scale) - 10,
-        ...config
-      };
+      const config = getConfig();
       window.history.pushState('', '', objToLocationSearch(config));
 
       const canvas = getCanvas(config.width, config.height, config.scale);
